@@ -30,7 +30,7 @@ async function run() {
 
 
 const userCollection=client.db('donationDB').collection('users')
-
+const userResistration=client.db('donationDB').collection('resistration')
 
 
 
@@ -54,14 +54,26 @@ const userCollection=client.db('donationDB').collection('users')
      })
 
      app.get('/users',async(req,res)=>{
-        const reslut=await userCollection.find().toArray()
+        const result=await userCollection.find().toArray()
+        res.send(result)
      })
 
 
+              //USER RESISTRATION
+
+      
+    app.post('/resistration',async(req,res)=>{
+      const resistrationInfo=req.body
+      console.log('User resistration Uploaded',resistrationInfo)
+      const result=await userResistration.insertOne(resistrationInfo)
+      res.send(result)
+    })
 
 
-
-
+    app.get('/resistration',async(req,res)=>{
+      const result=await userResistration.find().toArray()
+      res.send(result)
+   })
 
 
 
