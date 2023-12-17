@@ -11,7 +11,7 @@ app.use(express.json())
 app.use(cors())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.u2o3a1l.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -31,6 +31,7 @@ async function run() {
 
 const userCollection=client.db('donationDB').collection('users')
 const userResistration=client.db('donationDB').collection('resistration')
+const donationRequestCollection=client.db('donationDB').collection('donationRequest')
 
 
 
@@ -76,11 +77,51 @@ const userResistration=client.db('donationDB').collection('resistration')
    })
 
 
+ 
+   app.get('/resistration/:email',async(req,res)=>{
+    const UserEmail=req.params.email
+    const query={email:UserEmail}
+    const result=await userResistration.find(query).toArray()
+    res.send(result)
+ })
 
 
 
 
 
+
+
+         //DONATION REQUEST POST/GET
+
+         app.post('/request',async(req,res)=>{
+          const donationInfo=req.body
+          console.log('donation Request Uploaded',donationInfo)
+          const result=await donationRequestCollection.insertOne(donationInfo)
+          res.send(result)
+         })
+
+
+         app.get('/request',async(req,res)=>{
+          const result=await donationRequestCollection.find().toArray()
+          res.send(result)
+         })
+
+
+
+       app.patch('/request/:id',async(req,res)=>{
+      const requestInfo=req.body
+        const id=req.params.id
+        const query={_id:new ObjectId(id)}
+        const updateDoc={
+
+          $set:{
+            
+          status:requestInfo.status
+          }
+           }
+           const result=await donationRequestCollection.updateOne(query,updateDoc)
+           res.send(result)
+       })
 
 
 
